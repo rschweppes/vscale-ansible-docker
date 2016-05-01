@@ -1,0 +1,21 @@
+---
+- name: Install desired packages
+  apt:
+    pkg: "{{ item }}"
+    state: latest
+  with_items:
+    - htop
+    - tree
+    - jq
+    - fail2ban
+    - vim
+    - mosh
+    - ufw
+    - apt-transport-https
+    - ca-certificates
+    - python-dev
+    - python-setuptools
+
+- name: Install pip
+  easy_install:
+    name=pip

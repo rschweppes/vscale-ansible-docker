@@ -1,125 +1,19 @@
 ---
-
-- name: Add SSH key to vscale hosting and create scalets
+- hosts: pt
   connection: local
   gather_facts: True
-  hosts:
-    - pt
-  tasks:
-    - name: Add SSH key to Vscale account
-      run_once: true
-      vscale_ssh:
-        token: "{{ vscale_token }}"
-        name: "Ansible"
-        public_key: "{{ key }}"
-        state: present
-
-    - name: Create scalet for inventory hosts
-      vscale_scalets:
-        token: "{{ vscale_token }}"
-        name: "{{ inventory_hostname }}"
-        plan: small
-        location: spb0
-        image: ubuntu_16.04_64_001_master
-        key_name: "Ansible"
-        collect_facts: "yes"
-        power_state: "started"
-        upgrade: "yes"
-        state: present
-      register: server
-
-    - set_fact:
-        ansible_ssh_host: "{{ server['scalet']['public_address']['address'] }}"
+  roles:
+    - { role: scalets }
 
 - hosts: pt
-  gather_facts: True
-  tasks:
-    - name: apt-get update
-      raw: apt-get update -qq
-    - name: Install python 2.7
-      raw: apt-get install -qq python2.7
-    - name: Install desired packages
-      apt:
-        pkg: "{{ item }}"
-        state: latest
-      with_items:
-        - htop
-        - tree
-        - jq
-        - fail2ban
-        - vim
-        - mosh
-        - ufw
-        - apt-transport-https
-        - ca-certificates
-        - python-dev
-        - python-setuptools
-        - python3-dev
-        - python3-setuptools
+  gather_facts: False
+  roles:
+    - { role: packages }
 
-    - name: Install pip
-      easy_install:
-        name=pip
-    - name: Install docker-py
-      pip:
-        name=docker-py 
-        state=present
-        version=1.1.0
-    - name: Add docker apt repo
-      apt_repository:
-        repo='deb https://apt.dockerproject.org/repo ubuntu-{{ ansible_distribution_release }} main'
-        state=present
+- hosts: pt
+  roles:
+    - { role: docker }
 
-    - name: Import the Docker repository key
-      apt_key:        
-        keyserver=hkp://p80.pool.sks-keyservers.net:80
-        id=58118E89F3A912897C070ADBF76221572C52609D
-
-    - name: Install Docker package
-      apt:
-        name=docker-engine
-        update_cache=yes
-
-    ####
-    # - name: Create a docker group
-    #   group: 
-    #       name=docker 
-    #       state=present
-
-    # - name: Add user(s) to docker group
-    #   user: 
-    #       name={{ item }} 
-    #       group=docker 
-    #       state=present
-    #   with_items: docker_users
-    #   when: docker_users is defined
-
-    - name: Configure Docker 
-      template: 
-          src=default_docker.j2 
-          dest=/etc/default/docker 
-          mode=0644 
-          owner=root 
-          group=root
-      notify: systemctl restart docker
-    
-    - name: UFW logging
-      ufw: logging=on
-
-    - name: UFW SSH
-      ufw: rule=allow port=ssh
-
-    - name: UFW Docker
-      ufw: rule=allow port=2375 proto=tcp
-
-    - name: UFW default policy
-      ufw: state=enabled policy=reject
-    
-    - name: UFW start
-      ufw: state=enabled
-
-
-# docker_opts:
-#   - '--dns 8.8.8.8'
-#   - '-H tcp://0.0.0.0:2375'
-
+- hosts: pt
+  roles:
+    - { role: ufw }

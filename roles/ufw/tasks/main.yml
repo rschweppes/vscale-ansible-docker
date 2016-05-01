@@ -1,0 +1,12 @@
+---    
+- name: UFW logging
+  ufw: logging=on
+
+- name: UFW SSH
+  ufw: rule=allow port=ssh
+
+- name: UFW Docker
+  ufw: rule=allow port=2375 proto=tcp
+
+- name: UFW default policy
+  ufw: state=enabled policy=reject
