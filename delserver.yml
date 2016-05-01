@@ -6,7 +6,7 @@
   hosts:
     - pt
   tasks:
-    - name: Delete all scalets
+    - name: Delete scalets
       vscale_scalets:
         token: "{{ vscale_token }}"
         name: "{{ inventory_hostname }}"

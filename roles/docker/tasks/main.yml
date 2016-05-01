@@ -1,9 +1,4 @@
 ---
-- name: Install docker-py
-  pip:
-    name=docker-py 
-    state=present
-    version=1.1.0
 - name: Add docker apt repo
   apt_repository:
     repo='deb https://apt.dockerproject.org/repo ubuntu-trusty main'
@@ -18,19 +13,6 @@
   apt:
     name=docker-engine
     update_cache=yes
-
-# - name: Create a docker group
-#   group: 
-#       name=docker 
-#       state=present
-
-# - name: Add user(s) to docker group
-#   user: 
-#       name={{ item }} 
-#       group=docker 
-#       state=present
-#   with_items: docker_users
-#   when: docker_users is defined
 
 - name: Configure Docker 
   template: 

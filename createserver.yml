@@ -6,14 +6,7 @@
     - { role: scalets }
 
 - hosts: pt
-  gather_facts: False
   roles:
     - { role: packages }
-
-- hosts: pt
-  roles:
     - { role: docker }
-
-- hosts: pt
-  roles:
     - { role: ufw }
