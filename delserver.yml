@@ -1,0 +1,14 @@
+---
+
+- name: Delete scalets
+  connection: local
+  gather_facts: True
+  hosts:
+    - pt
+  tasks:
+    - name: Delete all scalets
+      vscale_scalets:
+        token: "{{ vscale_token }}"
+        name: "{{ inventory_hostname }}"
+        state: absent
+      register: server

@@ -1,0 +1,7 @@
+---
+vscale_token: "{{ lookup('env', 'VS_API_KEY')}}"
+key: "{{ lookup('file', 'credentials/ansible.pub') }}"
+
+docker_opts: 
+  - '--dns 8.8.8.8'
+  - '-H tcp://0.0.0.0:2375'
